@@ -1,0 +1,23 @@
+{
+  "name": "movie-master-service",
+  "version": "1.0.0",
+  "description": "Service that fetches results from Movie database based on given filter parameters",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node buildScripts/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ravitej5226/MovieMaster.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ravitej5226/MovieMaster/issues"
+  },
+  "homepage": "https://github.com/ravitej5226/MovieMaster#readme",
+  "dependencies": {
+    "express": "^4.15.3"
+  }
+}
