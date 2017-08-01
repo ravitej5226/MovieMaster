@@ -1,11 +1,13 @@
+var movieService=require('../services/tmdbservice');
+
 var movieController = function () {
   var getUpcomingMovies = function (req, res) {
-     console.log('controller')
-    res.send('<h2>Upcoming movies</h2>');
+    res.send(movieService.getUpcomingMovies())
+
   };
 
   return {
-    getUpcomingMovies:getUpcomingMovies
+    getUpcomingMovies: getUpcomingMovies
   };
 };
 

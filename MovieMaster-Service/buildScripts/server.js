@@ -2,7 +2,7 @@ var express=require('express');
 var path=require('path');
 var open=require('open');
 var movieRouter=require('../routers/movieRouter');
-
+var userSecrets=require('../usersecrets.config.dev')
 
 //var webpack = require('webpack')
 //var config = require('../webpack.config.dev')
@@ -11,7 +11,6 @@ var movieRouter=require('../routers/movieRouter');
 
 const port=3000;
 var app=express();
-var router=express.Router();
 
 /* Fix the below code later */
 //const compiler=webpack(config);
@@ -21,13 +20,11 @@ var router=express.Router();
 //     publicPath:config.output.publicPath
 // }));
 
-
-app.use('/Movies',router);
-router.route('/').get(function(req,res){
-    res.send('Get the latest movies here!');
-})
-
 app.use('/movies',movieRouter);
+//app.use('/Movies',router);
+
+
+
 
 app.get('/',function(req,res){
     res.sendFile(path.join(__dirname,'../src/index.html'));
@@ -39,6 +36,7 @@ app.listen(port,function(err){
         console.log(err);
     }
     else{
+      console.log(userSecrets)
         open('http://localhost:'+port);
     }
 })
