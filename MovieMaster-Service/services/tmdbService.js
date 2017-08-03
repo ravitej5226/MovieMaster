@@ -16,7 +16,7 @@ var tmdbService = function () {
         include_adult: 'false',
         sort_by: 'release_date.desc',
         language: 'en-US',
-        api_key: userSecrets.default.moviedb_api_key
+        api_key: userSecrets.moviedb_api_key
       },
       body: '{}'
     };

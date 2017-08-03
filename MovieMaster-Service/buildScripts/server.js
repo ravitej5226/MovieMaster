@@ -21,10 +21,6 @@ var app=express();
 // }));
 
 app.use('/movies',movieRouter);
-//app.use('/Movies',router);
-
-
-
 
 app.get('/',function(req,res){
     res.sendFile(path.join(__dirname,'../src/index.html'));
@@ -37,6 +33,6 @@ app.listen(port,function(err){
     }
     else{
       console.log(userSecrets)
-        open('http://localhost:'+port);
+      //  open('http://localhost:'+port);
     }
 })

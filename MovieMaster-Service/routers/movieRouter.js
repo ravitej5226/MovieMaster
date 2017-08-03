@@ -9,7 +9,7 @@ var router = function () {
 
   movieRouter.route('/').get(movieController.getUpcomingMovies)
   movieRouter.route('/upcoming').get(movieController.getUpcomingMovies)
-
+  movieRouter.route('/recent').get(movieController.getRecentMovies)
   return movieRouter;
 };
 
