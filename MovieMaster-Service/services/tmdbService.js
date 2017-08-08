@@ -30,18 +30,52 @@ var tmdbService = function () {
         return;
       }
 
-      var movies = ['test'];
+      var movies = [];
       Enumerable.from(JSON.parse(body).results).forEach(function (item) {
         movies.push(item.title);
       })
       callback(error, movies);
     });
 
-    return 'test'
+
+  }
+
+  var getRecentMovies = function (callback) {
+    var request = require("request");
+
+    var options = {
+      method: 'GET',
+      url: 'https://api.themoviedb.org/3/movie/now_playing',
+      qs:
+      {
+        page: '1',
+        language: 'en-US',
+        api_key: '89f7afce62ef1377768a055ecb4e6bdf'
+      },
+      body: '{}'
+    };
+
+    request(options, function (error, response, body) {
+      if (error) throw new Error(error);
+
+     if (JSON.parse(body).success == false) {
+        callback(body, null)
+        return;
+      }
+
+      var movies = [];
+      Enumerable.from(JSON.parse(body).results).forEach(function (item) {
+        movies.push(item.title);
+      })
+      callback(error, movies);
+
+      
+    });
   }
 
   return {
-    getUpcomingMovies: getUpcomingMovies
+    getUpcomingMovies: getUpcomingMovies,
+    getRecentMovies: getRecentMovies
   }
 }
 

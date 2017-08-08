@@ -9,7 +9,7 @@ var movieController = function () {
   };
 
   var getRecentMovies=function(req,res){
-      movieService.getUpcomingMovies(function(err,results){
+      movieService.getRecentMovies(function(err,results){
       serviceCallback(err,results,res);
     });
   };
