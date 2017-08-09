@@ -23,7 +23,9 @@
   },
   "homepage": "https://github.com/ravitej5226/MovieMaster#readme",
   "dependencies": {
+    "actions-on-google": "^1.2.0",
     "babel": "^6.23.0",
+    "body-parser": "^1.17.2",
     "express": "^4.15.3",
     "html-webpack-plugin": "^2.22.0",
     "linq": "^3.0.8",
