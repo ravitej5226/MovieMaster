@@ -4,7 +4,8 @@ var open=require('open');
 var movieRouter=require('../routers/movieRouter');
 var userSecrets=require('../usersecrets.config.dev')
 var bodyParser=require('body-parser')
-const { ApiAiApp } = require('actions-on-google');
+var homeController=require('../controllers/homeController')
+
 //var webpack = require('webpack')
 //var config = require('../webpack.config.dev')
 
@@ -24,6 +25,7 @@ app.use(bodyParser.json());
 app.use('/movies',movieRouter);
 
 app.get('/',function(req,res){
+  homeController.getResponse(req,res);
   console.log(req.body)
   //console.log(res)
     res.sendFile(path.join(__dirname,'../src/index.html'));
@@ -31,15 +33,13 @@ app.get('/',function(req,res){
 });
 
 app.post('/',function(req,res){
-   console.log(req.body)
-
-    const app1 = new ApiAiApp({ req, res });
-  console.log(`Request headers: ${JSON.stringify(req.headers)}`);
-  console.log(`Request body: ${JSON.stringify(req.body)}`);
-  app1.handleRequest(actionMap);
+  homeController.getResponse(req,res,function(err,results){
+    res.send(results);
+  });
+  //  console.log(req.body)
 
   //console.log(res)
-    res.sendFile(path.join(__dirname,'../src/index.html'));
+ //   res.sendFile(path.join(__dirname,'../src/index.html'));
 
 });
 
