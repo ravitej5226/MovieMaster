@@ -50,7 +50,7 @@ var tmdbService = function () {
       {
         page: '1',
         language: 'en-US',
-        api_key: '89f7afce62ef1377768a055ecb4e6bdf'
+        api_key: userSecrets.moviedb_api_key
       },
       body: '{}'
     };

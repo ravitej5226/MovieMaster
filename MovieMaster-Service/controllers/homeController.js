@@ -1,6 +1,6 @@
 const ApiAiApp = require('actions-on-google').ApiAiApp;
 const { sprintf } = require('sprintf-js');
-
+var movieService = require('../services/tmdbService');
 
 const Actions = {
   UNRECOGNIZED_DEEP_LINK: 'deeplink.unknown',
@@ -47,13 +47,13 @@ var homeController = function () {
   };
 
   var getResponse = function (req, res, callback) {
-//    res.send("hello world");
+    //    res.send("hello world");
 
     const app = new ApiAiApp({ request: req, response: res });
     console.log(`Request headers: ${JSON.stringify(req.headers)}`);
     console.log(`Request body: ${JSON.stringify(req.body)}`);
-    results = app.handleRequest(actionMap);
-    callback(null, "listening");
+    app.handleRequest(actionMap);
+    //callback(null, "listening");
   }
 
   const tellCatFact = app => {
@@ -117,68 +117,75 @@ var homeController = function () {
   };
 
   const tellFact = app => {
-    app.tell('strings.general.heardItAll');
-    const data = initData(app);
-    const facts = data.facts.content;
-    for (const category of Object.values(strings.categories)) {
-      // Initialize categories with all the facts if they haven't been read
-      if (!facts[category.category]) {
-        facts[category.category] = category.facts.slice();
-      }
-    }
-    if (Object.values(facts).every(category => !category.length)) {
-      // If every fact category facts stored in app.data is empty
-      return app.tell(strings.general.heardItAll);
-    }
-    const parameter = Parameters.CATEGORY;
-    /** @type {string} */
-    const factCategory = app.getArgument(parameter);
-    /** @type {boolean} */
-    const screenOutput = app.hasSurfaceCapability(app.SurfaceCapabilities.SCREEN_OUTPUT);
-    const category = strings.categories[factCategory];
-    if (!category) {
-      /** @type {string} */
-      const action = app.getIntent();
-      return console.error(`${parameter} parameter is unrecognized or not provided by API.AI ${action} action`);
-    }
-    const fact = getRandomFact(facts[category.category]);
-    if (!fact) {
-      const otherCategory = Object.values(strings.categories).find(other => other !== category);
-      if (!otherCategory) {
-        return console.error(`No other category besides ${category.category} exists`);
-      }
-      if (!screenOutput) {
-        return app.ask(noFactsLeft(app, factCategory, otherCategory.category), strings.general.noInputs);
-      }
-      const suggestions = [otherCategory.suggestion];
-      const catFacts = data.facts.cats;
-      if (!catFacts || catFacts.length) {
-        // If cat facts not loaded or there still are cat facts left
-        suggestions.push(strings.cats.suggestion);
-      }
-      const richResponse = app.buildRichResponse()
-        .addSimpleResponse(noFactsLeft(app, factCategory, otherCategory.category))
-        .addSuggestions(suggestions);
+    // Connect to movie service
+    movieService.getRecentMovies(function (err, results) {
+      // Get results array
+      app.tell(`Movies currently running are ${results.join(', ')}`)
+      // Return the response
+    });
 
-      return app.ask(richResponse, strings.general.noInputs);
-    }
-    const factPrefix = category.factPrefix;
-    if (!screenOutput) {
-      return app.ask(concat([factPrefix, fact, strings.general.nextFact]), strings.general.noInputs);
-    }
-    const image = getRandomValue(strings.content.images);
-    const [url, name] = image;
-    const card = app.buildBasicCard(fact)
-      .addButton(strings.general.linkOut, strings.content.link)
-      .setImage(url, name);
+    // app.tell('strings.general.heardItAll');
+    // const data = initData(app);
+    // const facts = data.facts.content;
+    // for (const category of Object.values(strings.categories)) {
+    //   // Initialize categories with all the facts if they haven't been read
+    //   if (!facts[category.category]) {
+    //     facts[category.category] = category.facts.slice();
+    //   }
+    // }
+    // if (Object.values(facts).every(category => !category.length)) {
+    //   // If every fact category facts stored in app.data is empty
+    //   return app.tell(strings.general.heardItAll);
+    // }
+    // const parameter = Parameters.CATEGORY;
+    // /** @type {string} */
+    // const factCategory = app.getArgument(parameter);
+    // /** @type {boolean} */
+    // const screenOutput = app.hasSurfaceCapability(app.SurfaceCapabilities.SCREEN_OUTPUT);
+    // const category = strings.categories[factCategory];
+    // if (!category) {
+    //   /** @type {string} */
+    //   const action = app.getIntent();
+    //   return console.error(`${parameter} parameter is unrecognized or not provided by API.AI ${action} action`);
+    // }
+    // const fact = getRandomFact(facts[category.category]);
+    // if (!fact) {
+    //   const otherCategory = Object.values(strings.categories).find(other => other !== category);
+    //   if (!otherCategory) {
+    //     return console.error(`No other category besides ${category.category} exists`);
+    //   }
+    //   if (!screenOutput) {
+    //     return app.ask(noFactsLeft(app, factCategory, otherCategory.category), strings.general.noInputs);
+    //   }
+    //   const suggestions = [otherCategory.suggestion];
+    //   const catFacts = data.facts.cats;
+    //   if (!catFacts || catFacts.length) {
+    //     // If cat facts not loaded or there still are cat facts left
+    //     suggestions.push(strings.cats.suggestion);
+    //   }
+    //   const richResponse = app.buildRichResponse()
+    //     .addSimpleResponse(noFactsLeft(app, factCategory, otherCategory.category))
+    //     .addSuggestions(suggestions);
 
-    const richResponse = app.buildRichResponse()
-      .addSimpleResponse(factPrefix)
-      .addBasicCard(card)
-      .addSimpleResponse(strings.general.nextFact)
-      .addSuggestions(strings.general.suggestions.confirmation);
+    //   return app.ask(richResponse, strings.general.noInputs);
+    // }
+    // const factPrefix = category.factPrefix;
+    // if (!screenOutput) {
+    //   return app.ask(concat([factPrefix, fact, strings.general.nextFact]), strings.general.noInputs);
+    // }
+    // const image = getRandomValue(strings.content.images);
+    // const [url, name] = image;
+    // const card = app.buildBasicCard(fact)
+    //   .addButton(strings.general.linkOut, strings.content.link)
+    //   .setImage(url, name);
 
-    app.ask(richResponse, strings.general.noInputs);
+    // const richResponse = app.buildRichResponse()
+    //   .addSimpleResponse(factPrefix)
+    //   .addBasicCard(card)
+    //   .addSimpleResponse(strings.general.nextFact)
+    //   .addSuggestions(strings.general.suggestions.confirmation);
+
+    // app.ask(richResponse, strings.general.noInputs);
   };
   const actionMap = new Map();
   actionMap.set(Actions.UNRECOGNIZED_DEEP_LINK, unhandledDeepLinks);
