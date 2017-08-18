@@ -50,7 +50,7 @@ var tmdbService = function () {
       {
         page: '1',
         language: 'en-US',
-        api_key: '89f7afce62ef1377768a055ecb4e6bdf'
+        api_key: userSecrets.moviedb_api_key
       },
       body: '{}'
     };
@@ -58,7 +58,7 @@ var tmdbService = function () {
     request(options, function (error, response, body) {
       if (error) throw new Error(error);
 
-     if (JSON.parse(body).success == false) {
+      if (JSON.parse(body).success == false) {
         callback(body, null)
         return;
       }
@@ -69,13 +69,64 @@ var tmdbService = function () {
       })
       callback(error, movies);
 
-      
+
     });
+  }
+
+
+  var getSummary = function (query, callback) {
+
+    // Search for a movie and get the id
+    var options = {
+      method: 'GET',
+      url: 'https://api.themoviedb.org/3/search/movie',
+      qs:
+      {
+        include_adult: 'false',
+        page: '1',
+        query: query,
+        language: 'en-US',
+        api_key:  userSecrets.moviedb_api_key
+      },
+      body: '{}'
+    };
+
+    request(options, function (error, response, body) {
+      if (error) throw new Error(error);
+
+      if (JSON.parse(body).success == false) {
+        callback(body, null)
+        return;
+      }
+
+      // Search the first result and get all the movie information\
+      var options = {
+        method: 'GET',
+        url: 'https://api.themoviedb.org/3/movie/297762',
+        qs:
+        {
+          language: 'en-US',
+          api_key:  userSecrets.moviedb_api_key
+        },
+        body: '{}'
+      };
+
+      request(options, function (error, response, body) {
+        if (error) throw new Error(error);
+
+       callback(error, JSON.parse(body));
+      });
+
+
+
+    });
+
   }
 
   return {
     getUpcomingMovies: getUpcomingMovies,
-    getRecentMovies: getRecentMovies
+    getRecentMovies: getRecentMovies,
+    getSummary: getSummary
   }
 }
 

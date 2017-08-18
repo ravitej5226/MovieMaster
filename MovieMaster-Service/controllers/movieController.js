@@ -14,6 +14,14 @@ var movieController = function () {
     });
   };
 
+   var getSummary=function(req,res){
+
+      movieService.getSummary(req.params.item,function(err,results){
+      serviceCallback(err,results,res);
+    });
+
+  };
+
   function serviceCallback(err, results,res) {
     if (!err) {
       res.send(results);
@@ -24,7 +32,8 @@ var movieController = function () {
   }
   return {
     getUpcomingMovies: getUpcomingMovies,
-    getRecentMovies:getRecentMovies
+    getRecentMovies:getRecentMovies,
+    getSummary:getSummary
   };
 };
 
