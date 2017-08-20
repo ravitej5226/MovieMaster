@@ -86,7 +86,7 @@ var tmdbService = function () {
         page: '1',
         query: query,
         language: 'en-US',
-        api_key:  userSecrets.moviedb_api_key
+        api_key: userSecrets.moviedb_api_key
       },
       body: '{}'
     };
@@ -98,35 +98,62 @@ var tmdbService = function () {
         callback(body, null)
         return;
       }
-
-      // Search the first result and get all the movie information\
-      var options = {
-        method: 'GET',
-        url: 'https://api.themoviedb.org/3/movie/297762',
-        qs:
-        {
-          language: 'en-US',
-          api_key:  userSecrets.moviedb_api_key
-        },
-        body: '{}'
-      };
-
-      request(options, function (error, response, body) {
-        if (error) throw new Error(error);
-
-       callback(error, JSON.parse(body));
-      });
-
-
-
+      callback(error, JSON.parse(body).results);
     });
 
+  }
+
+  var getMovieDetails = function (movieId, callback) {
+    // Search the first result and get all the movie information\
+    var options = {
+      method: 'GET',
+      url: 'https://api.themoviedb.org/3/movie/' + movieId,
+      qs:
+      {
+        language: 'en-US',
+        api_key: userSecrets.moviedb_api_key
+      },
+      body: '{}'
+    };
+
+    request(options, function (error, response, body) {
+      if (error) throw new Error(error);
+
+      if (JSON.parse(body).success == false) {
+        callback(body, null)
+        return;
+      }
+      callback(error, JSON.parse(body));
+    });
+
+  }
+
+  var getMovieCast = function (movieId, callback) {
+    var options = {
+      method: 'GET',
+      url: 'https://api.themoviedb.org/3/movie/'+movieId+'/credits',
+      qs: { api_key: userSecrets.moviedb_api_key },
+      body: '{}'
+    };
+
+    request(options, function (error, response, body) {
+      if (error) throw new Error(error);
+
+      if (JSON.parse(body).success == false) {
+        callback(body, null)
+        return;
+      }
+
+       callback(error, JSON.parse(body));
+    });
   }
 
   return {
     getUpcomingMovies: getUpcomingMovies,
     getRecentMovies: getRecentMovies,
-    getSummary: getSummary
+    getSummary: getSummary,
+    getMovieDetails: getMovieDetails,
+    getMovieCast:getMovieCast
   }
 }
 

@@ -1,10 +1,12 @@
 const ApiAiApp = require('actions-on-google').ApiAiApp;
 const { sprintf } = require('sprintf-js');
+var util=require('util');
+var Enumerable = require('linq');
 var movieService = require('../services/tmdbService');
 
 const Actions = {
   UNRECOGNIZED_DEEP_LINK: 'deeplink.unknown',
-  TELL_FACT: 'tell.fact',
+  TELL_Summary: 'tell.summary',
   TELL_CAT_FACT: 'tell.cat.fact'
 };
 
@@ -37,11 +39,9 @@ var homeController = function () {
   const initData = app => {
     /** @type {AppData} */
     const data = app.data;
-    if (!data.facts) {
-      data.facts = {
-        content: {},
-        cats: null
-      };
+    // Load the entities
+    if (app.body_.result.parameters) {
+      data.Movie = app.body_.result.parameters.Movie;
     }
     return data;
   };
@@ -116,14 +116,50 @@ var homeController = function () {
     app.ask(richResponse, strings.general.noInputs);
   };
 
-  const tellFact = app => {
+  // Tells the summary of movie details
+  const tellSummary = app => {
+    data = initData(app);
+    console.log(data)
     // Connect to movie service
-    movieService.getRecentMovies(function (err, results) {
+    movieService.getSummary(data.Movie, function (err, results) {
+      // If error, throw exception
+      console.log(results.length)
+      if (err || results.length == 0) {
+        app.ask('I could not understand your request. You can say "Tell me about wonder woman"')
+      }
+
       // Get results array
-      app.tell(`Movies currently running are ${results.join(', ')}`)
+      movieService.getMovieDetails(results[0].id, function (err, results) {
+        movieService.getMovieCast(results.id, function (err, cast) {
+          console.log(results)
+          var response = getMovieDetailResponse(results,cast);
+          app.tell(response)
+        })
+
+      })
+
       // Return the response
     });
 
+    function getMovieDetailResponse(movie,cast) {
+      // Get movie name
+      // Get genre
+      // Get director
+      // Get the cast
+      // Get the overview
+      
+      var actors=Enumerable.from(cast.cast).orderBy(t=>t.order).take(3).select(k=>k.name).toArray();
+      var director=Enumerable.from(cast.crew).where(t=>t.job=="Director").first().name;
+      var genre=movie.genres[0].name
+      if (['a','e','i','o','u'].indexOf(genre[0].toLowerCase())==-1){
+        genre='a ' + genre;
+      }
+      else{
+        genre='an '+genre
+      }
+      var response = `${movie.title} is ${genre} movie directed by ${director}, casting ${actors}. Here is the movie overview "${movie.overview}".`
+      return response;
+    }
     // app.tell('strings.general.heardItAll');
     // const data = initData(app);
     // const facts = data.facts.content;
@@ -189,7 +225,7 @@ var homeController = function () {
   };
   const actionMap = new Map();
   actionMap.set(Actions.UNRECOGNIZED_DEEP_LINK, unhandledDeepLinks);
-  actionMap.set(Actions.TELL_FACT, tellFact);
+  actionMap.set(Actions.TELL_Summary, tellSummary);
   actionMap.set(Actions.TELL_CAT_FACT, tellCatFact);
 
   return {
